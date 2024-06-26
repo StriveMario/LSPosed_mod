@@ -10,15 +10,16 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedInit;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import io.github.libxposed.api.XposedInterface;
-import io.github.libxposed.api.annotations.AfterInvocation;
+import io.github.libxposed.api.annotations.BeforeInvocation;
 import io.github.libxposed.api.annotations.XposedHooker;
 
 @XposedHooker
 public class ApplicationHooker implements XposedInterface.Hooker {
 
-    //    public static void beforeHookedMethod(XposedInterface.AfterHookCallback callback) {
+//    public static void beforeHookedMethod(XposedInterface.AfterHookCallback callback) {
 //
 //    }
+
     @BeforeInvocation
     public static void beforeHookedMethod(XposedInterface.BeforeHookCallback callback) {
         Log.i("LSPosed", "ApplicationHooker beforeHookedMethod ... ");
