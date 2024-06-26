@@ -3,6 +3,8 @@ package org.lsposed.lspd.hooker;
 import android.app.ActivityThread;
 import android.util.Log;
 
+import org.lsposed.lspd.util.Hookers;
+
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedInit;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -33,6 +35,13 @@ public class AttachHooker implements XposedInterface.Hooker {
         lpparam.classLoader = actThreadObj.getClass().getClassLoader();
         lpparam.appInfo = null;
         lpparam.isFirstApplication = isFirstPackage;
+
+        Log.i("LSPosed", "Call handleLoadedPackage: packageName=" + lpparam.packageName + " processName=" + lpparam.processName + " isFirstPackage=" + isFirstPackage + " classLoader=" + lpparam.classLoader + " appInfo=" + lpparam.appInfo);
+        //深蓝的应用再注入
+        if(packageName.contains("deepal")){
+            XC_LoadPackage.callAll(lpparam);
+        }
+
 
 
         XposedInit.loadModules(actThreadObj);
