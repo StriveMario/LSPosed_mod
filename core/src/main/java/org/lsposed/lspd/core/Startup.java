@@ -21,13 +21,16 @@
 package org.lsposed.lspd.core;
 
 import android.app.ActivityThread;
+import android.app.Application;
 import android.app.LoadedApk;
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.res.CompatibilityInfo;
 
 import com.android.internal.os.ZygoteInit;
 
 import org.lsposed.lspd.deopt.PrebuiltMethodsDeopter;
+import org.lsposed.lspd.hooker.ApplicationHooker;
 import org.lsposed.lspd.hooker.AttachHooker;
 import org.lsposed.lspd.hooker.CrashDumpHooker;
 import org.lsposed.lspd.hooker.HandleSystemServerProcessHooker;
@@ -42,7 +45,9 @@ import org.lsposed.lspd.util.Utils;
 import java.util.List;
 
 import dalvik.system.DexFile;
+import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.XposedInit;
 
 public class Startup {
@@ -61,6 +66,10 @@ public class Startup {
                 ClassLoader.class, boolean.class, boolean.class, boolean.class);
         LSPosedHelper.hookMethod(LoadedApkCreateCLHooker.class, LoadedApk.class, "createOrUpdateClassLoaderLocked", List.class);
         LSPosedHelper.hookAllMethods(AttachHooker.class, ActivityThread.class, "attach");
+
+        LSPosedHelper.hookMethod(ApplicationHooker.class, Application.class, "attach", Context.class);
+
+
     }
 
     public static void bootstrapXposed() {

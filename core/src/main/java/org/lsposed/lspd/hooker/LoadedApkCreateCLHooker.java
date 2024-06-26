@@ -90,7 +90,6 @@ public class LoadedApkCreateCLHooker implements XposedInterface.Hooker {
         try {
             Hookers.logD("LoadedApk#createClassLoader starts");
 
-
             String packageName = ActivityThread.currentPackageName();
             String processName = ActivityThread.currentProcessName();
             boolean isFirstPackage = packageName != null && processName != null && packageName.equals(loadedApk.getPackageName());

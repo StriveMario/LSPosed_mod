@@ -136,11 +136,9 @@ abstract public class XCallback {
 
         Log.i("LSPosed", "XCallback  callAll 111 ...");
         if (param instanceof XC_LoadPackage.LoadPackageParam) {
-            Log.i("LSPosed", "XCallback  callAll 222 ...");
             // deopt methods in system apps or priv-apps, this would be not necessary
             // only if we found out how to recompile their apks
             XC_LoadPackage.LoadPackageParam lpp = (XC_LoadPackage.LoadPackageParam) param;
-            Log.i("LSPosed", "XCallback  callAll 333 ...");
             PrebuiltMethodsDeopter.deoptMethods(lpp.packageName, lpp.classLoader);
         }
 
@@ -149,9 +147,7 @@ abstract public class XCallback {
 
         for (int i = 0; i < param.callbacks.length; i++) {
             try {
-                Log.i("LSPosed", "XCallback  callAll 444 ...");
                 param.callbacks[i].call(param);
-                Log.i("LSPosed", "XCallback  callAll 555 ...");
             } catch (Throwable t) {
                 XposedBridge.log(t);
             }
