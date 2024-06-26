@@ -23,22 +23,21 @@ public class AttachHooker implements XposedInterface.Hooker {
         Log.i("LSPosed", "AttachHooker afterHookedMethod ... ");
 
         ActivityThread actThreadObj = (ActivityThread) callback.getThisObject();
-        String packageName = ActivityThread.currentPackageName();
-        String processName = ActivityThread.currentProcessName();
-
-        boolean isFirstPackage = packageName != null && processName != null;
-
-        XC_LoadPackage.LoadPackageParam lpparam = new XC_LoadPackage.LoadPackageParam(
-                XposedBridge.sLoadedPackageCallbacks);
-        lpparam.packageName = packageName;
-        lpparam.processName = processName;
-        lpparam.classLoader = actThreadObj.getClass().getClassLoader();
-        lpparam.appInfo = null;
-        lpparam.isFirstApplication = isFirstPackage;
-
-        Log.i("LSPosed", "Call handleLoadedPackage: packageName=" + lpparam.packageName + " processName=" + lpparam.processName + " isFirstPackage=" + isFirstPackage + " classLoader=" + lpparam.classLoader + " appInfo=" + lpparam.appInfo);
-        //深蓝的应用再注入
+        String packageName = actThreadObj.getSystemContext().getPackageName();
+        String processName = packageName;
         if(packageName.contains("deepal")){
+            //深蓝的应用再注入
+            boolean isFirstPackage = packageName != null && processName != null;
+
+            XC_LoadPackage.LoadPackageParam lpparam = new XC_LoadPackage.LoadPackageParam(
+                    XposedBridge.sLoadedPackageCallbacks);
+            lpparam.packageName = packageName;
+            lpparam.processName = processName;
+            lpparam.classLoader = actThreadObj.getSystemContext().getClassLoader();
+            lpparam.appInfo = null;
+            lpparam.isFirstApplication = isFirstPackage;
+
+            Log.i("LSPosed", "Call handleLoadedPackage: packageName=" + lpparam.packageName + " processName=" + lpparam.processName + " isFirstPackage=" + isFirstPackage + " classLoader=" + lpparam.classLoader + " appInfo=" + lpparam.appInfo);
             XC_LoadPackage.callAll(lpparam);
         }
 
