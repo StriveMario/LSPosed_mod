@@ -275,6 +275,7 @@ public final class XposedBridge {
      */
     public static void hookLoadPackage(XC_LoadPackage callback) {
         synchronized (sLoadedPackageCallbacks) {
+            Log.i("LSPosed", "hookLoadPackage  : " + callback);
             sLoadedPackageCallbacks.add(callback);
         }
     }

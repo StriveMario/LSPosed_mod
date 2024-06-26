@@ -28,6 +28,7 @@ import android.app.LoadedApk;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -80,27 +81,39 @@ public class LoadedApkCreateCLHooker implements XposedInterface.Hooker {
 
     @AfterInvocation
     public static void afterHookedMethod(XposedInterface.AfterHookCallback callback) {
+        Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 111 ...");
+
         LoadedApk loadedApk = (LoadedApk) callback.getThisObject();
+
+        Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 222 ...");
 
         if (callback.getArgs()[0] != null || !loadedApks.contains(loadedApk)) {
             return;
         }
 
+        Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 333 ...");
+
         try {
             Hookers.logD("LoadedApk#createClassLoader starts");
+
 
             String packageName = ActivityThread.currentPackageName();
             String processName = ActivityThread.currentProcessName();
             boolean isFirstPackage = packageName != null && processName != null && packageName.equals(loadedApk.getPackageName());
             if (!isFirstPackage) {
+                Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 444 ...");
                 packageName = loadedApk.getPackageName();
+                Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 555 : " + packageName);
                 processName = ActivityThread.currentPackageName();
+                Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 666 : " + processName);
             } else if (packageName.equals("android")) {
                 packageName = "system";
             }
 
             Object mAppDir = XposedHelpers.getObjectField(loadedApk, "mAppDir");
+            Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 777 ... " + mAppDir);
             ClassLoader classLoader = (ClassLoader) XposedHelpers.getObjectField(loadedApk, "mClassLoader");
+            Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 888 ... " + classLoader);
             Hookers.logD("LoadedApk#createClassLoader ends: " + mAppDir + " -> " + classLoader);
 
             if (classLoader == null) {
@@ -125,10 +138,12 @@ public class LoadedApkCreateCLHooker implements XposedInterface.Hooker {
             lpparam.isFirstApplication = isFirstPackage;
 
             if (isFirstPackage && XposedInit.getLoadedModules().getOrDefault(packageName, Optional.empty()).isPresent()) {
+                Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 999 ...");
                 hookNewXSP(lpparam);
             }
-
+            Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 10 10 10 ...");
             IBinder moduleBinder = serviceClient.requestModuleBinder(lpparam.packageName);
+            Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 11 11 11 ...");
             if (moduleBinder != null) {
                 // Let the module to receive the binder for access to xposedservice
                 // Hook is only for module, not app
@@ -142,9 +157,10 @@ public class LoadedApkCreateCLHooker implements XposedInterface.Hooker {
                 });
             }
 
+            Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 12 12 12 ...");
             Hookers.logD("Call handleLoadedPackage: packageName=" + lpparam.packageName + " processName=" + lpparam.processName + " isFirstPackage=" + isFirstPackage + " classLoader=" + lpparam.classLoader + " appInfo=" + lpparam.appInfo);
             XC_LoadPackage.callAll(lpparam);
-
+            Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 13 13 13 ...");
             LSPosedContext.callOnPackageLoaded(new XposedModuleInterface.PackageLoadedParam() {
                 @NonNull
                 @Override
@@ -155,6 +171,7 @@ public class LoadedApkCreateCLHooker implements XposedInterface.Hooker {
                 @NonNull
                 @Override
                 public ApplicationInfo getApplicationInfo() {
+                    Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 14 14 14 ...");
                     return loadedApk.getApplicationInfo();
                 }
 
@@ -162,6 +179,7 @@ public class LoadedApkCreateCLHooker implements XposedInterface.Hooker {
                 @Override
                 public ClassLoader getDefaultClassLoader() {
                     try {
+                        Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 15 15 15 ...");
                         return (ClassLoader) defaultClassLoaderField.get(loadedApk);
                     } catch (Throwable t) {
                         throw new IllegalStateException(t);
@@ -171,11 +189,14 @@ public class LoadedApkCreateCLHooker implements XposedInterface.Hooker {
                 @NonNull
                 @Override
                 public ClassLoader getClassLoader() {
+                    Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 16 16 16 ...");
                     return classLoader;
                 }
 
                 @Override
                 public boolean isFirstPackage() {
+
+                    Log.i("LSPosed", "LoadedApkCreateCLHooker  afterHookedMethod 17 17 17 ...");
                     return isFirstPackage;
                 }
             });

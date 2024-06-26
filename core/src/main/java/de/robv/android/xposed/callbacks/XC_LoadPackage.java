@@ -101,7 +101,7 @@ public abstract class XC_LoadPackage extends XCallback implements IXposedHookLoa
     @Override
     protected void call(Param param) throws Throwable {
         if (param instanceof LoadPackageParam)
-            Log.i("LSPosed", Log.getStackTraceString(new Throwable()));
+            //Log.i("LSPosed", Log.getStackTraceString(new Throwable()));
             handleLoadPackage((LoadPackageParam) param);
     }
 }

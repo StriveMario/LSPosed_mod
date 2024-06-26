@@ -22,6 +22,8 @@ package org.lsposed.lspd.hooker;
 
 import static org.lsposed.lspd.util.Utils.logD;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import org.lsposed.lspd.impl.LSPosedContext;
@@ -40,19 +42,24 @@ public class StartBootstrapServicesHooker implements XposedInterface.Hooker {
 
     @BeforeInvocation
     public static void beforeHookedMethod() {
+        Log.i("LSPosed", "StartBootstrapServicesHooker  beforeHookedMethod 111 ...");
         logD("SystemServer#startBootstrapServices() starts");
 
         try {
             XposedInit.loadedPackagesInProcess.add("android");
+            Log.i("LSPosed", "StartBootstrapServicesHooker  beforeHookedMethod 222 ...");
 
             XC_LoadPackage.LoadPackageParam lpparam = new XC_LoadPackage.LoadPackageParam(XposedBridge.sLoadedPackageCallbacks);
+
+            Log.i("LSPosed", "StartBootstrapServicesHooker  beforeHookedMethod 333 ...");
             lpparam.packageName = "android";
             lpparam.processName = "android"; // it's actually system_server, but other functions return this as well
             lpparam.classLoader = HandleSystemServerProcessHooker.systemServerCL;
             lpparam.appInfo = null;
             lpparam.isFirstApplication = true;
+            Log.i("LSPosed", "StartBootstrapServicesHooker  beforeHookedMethod 444 ...");
             XC_LoadPackage.callAll(lpparam);
-
+            Log.i("LSPosed", "StartBootstrapServicesHooker  beforeHookedMethod 555 ...");
             LSPosedContext.callOnSystemServerLoaded(new XposedModuleInterface.SystemServerLoadedParam() {
                 @Override
                 @NonNull
@@ -60,6 +67,7 @@ public class StartBootstrapServicesHooker implements XposedInterface.Hooker {
                     return HandleSystemServerProcessHooker.systemServerCL;
                 }
             });
+            Log.i("LSPosed", "StartBootstrapServicesHooker  beforeHookedMethod 666 ...");
         } catch (Throwable t) {
             Hookers.logE("error when hooking startBootstrapServices", t);
         }
