@@ -263,18 +263,14 @@ public final class XposedInit {
                 Log.i(TAG, "  Loading class " + moduleClassName);
 
                 Class<?> moduleClass = mcl.loadClass(moduleClassName);
-                Log.i(TAG, "initModule 111 : " + moduleClass);
                 if (!IXposedMod.class.isAssignableFrom(moduleClass)) {
                     Log.e(TAG, "    This class doesn't implement any sub-interface of IXposedMod, skipping it");
                     continue;
                 }
 
                 final Object moduleInstance = moduleClass.newInstance();
-                Log.i("LSPosed", "initModule 222 : " + moduleInstance);
                 if (moduleInstance instanceof IXposedHookZygoteInit) {
-                    Log.i("LSPosed", "initModule 333 : " + moduleInstance);
                     IXposedHookZygoteInit.StartupParam param = new IXposedHookZygoteInit.StartupParam();
-                    Log.i("LSPosed", "initModule 444 : " + param);
                     param.modulePath = apk;
                     param.startsSystemServer = startsSystemServer;
                     ((IXposedHookZygoteInit) moduleInstance).initZygote(param);
@@ -282,7 +278,6 @@ public final class XposedInit {
                 }
 
                 if (moduleInstance instanceof IXposedHookLoadPackage) {
-                    Log.i("LSPosed", "initModule 555...");
                     XposedBridge.hookLoadPackage(new IXposedHookLoadPackage.Wrapper((IXposedHookLoadPackage) moduleInstance));
                     count++;
                 }
@@ -292,7 +287,6 @@ public final class XposedInit {
                     XposedBridge.hookInitPackageResources(new IXposedHookInitPackageResources.Wrapper((IXposedHookInitPackageResources) moduleInstance));
                     count++;
                 }
-                Log.i("LSPosed", "initModule 666...");
             } catch (Throwable t) {
                 Log.e(TAG, "    Failed to load class " + moduleClassName, t);
             }
