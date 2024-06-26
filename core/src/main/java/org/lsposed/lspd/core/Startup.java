@@ -71,38 +71,37 @@ public class Startup {
 
         //LSPosedHelper.hookMethod(ApplicationHooker.class, Application.class, "attach", Context.class);
 
+        XposedBridge.hookAllMethods(ActivityThread.class, "performLaunchActivity", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Log.i("LSPosed", "performLaunchActivity beforeHookedMethod ... ");
+                Application mInitialApplication = (Application) XposedHelpers.getObjectField(param.thisObject, "mInitialApplication");
+                // 获取上下文
+                Context context = (Context) mInitialApplication.getApplicationContext();
+                Log.i("LSPosed", "performLaunchActivity context : " + context );
 
-        XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class,
-                new XC_MethodHook() {
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        super.beforeHookedMethod(param);
-                        Log.i("LSPosed", "ApplicationHooker beforeHookedMethod ... ");
+                String packageName = context.getPackageName();
+                String processName = packageName;
+                Log.i("LSPosed", "performLaunchActivity packageName : " + packageName );
+                if(packageName.contains("deepal")){
+                    //深蓝的应用再注入
+                    boolean isFirstPackage = packageName != null && processName != null;
+                    ClassLoader classLoader = context.getClassLoader();
+                    Log.i("LSPosed", "performLaunchActivity classLoader : " + classLoader);
 
-                        // 获取上下文
-                        Context context = (Context) param.args[0];
-                        Log.i("LSPosed", "ApplicationHooker context : " + context );
+                    XC_LoadPackage.LoadPackageParam lpparam = new XC_LoadPackage.LoadPackageParam(
+                            XposedBridge.sLoadedPackageCallbacks);
+                    lpparam.packageName = packageName;
+                    lpparam.processName = processName;
+                    lpparam.classLoader = classLoader;
+                    lpparam.appInfo = null;
+                    lpparam.isFirstApplication = isFirstPackage;
+                    Log.i("LSPosed", "Call handleLoadedPackage: packageName=" + lpparam.packageName + " processName=" + lpparam.processName + " isFirstPackage=" + isFirstPackage + " classLoader=" + lpparam.classLoader + " appInfo=" + lpparam.appInfo);
+                    XC_LoadPackage.callAll(lpparam);
+                }
+            }
+        });
 
-                        String packageName = context.getPackageName();
-                        String processName = packageName;
-                        if(packageName.contains("deepal")){
-                            //深蓝的应用再注入
-                            boolean isFirstPackage = packageName != null && processName != null;
-                            ClassLoader classLoader = context.getClassLoader();
-                            Log.i("LSPosed", "ApplicationHooker classLoader : " + classLoader);
-
-                            XC_LoadPackage.LoadPackageParam lpparam = new XC_LoadPackage.LoadPackageParam(
-                                    XposedBridge.sLoadedPackageCallbacks);
-                            lpparam.packageName = packageName;
-                            lpparam.processName = processName;
-                            lpparam.classLoader = classLoader;
-                            lpparam.appInfo = null;
-                            lpparam.isFirstApplication = isFirstPackage;
-                            Log.i("LSPosed", "Call handleLoadedPackage: packageName=" + lpparam.packageName + " processName=" + lpparam.processName + " isFirstPackage=" + isFirstPackage + " classLoader=" + lpparam.classLoader + " appInfo=" + lpparam.appInfo);
-                            XC_LoadPackage.callAll(lpparam);
-                        }
-                    }
-                });
 
 
     }
