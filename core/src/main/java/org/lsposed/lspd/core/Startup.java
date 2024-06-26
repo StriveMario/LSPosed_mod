@@ -26,6 +26,7 @@ import android.app.LoadedApk;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.res.CompatibilityInfo;
+import android.util.Log;
 
 import com.android.internal.os.ZygoteInit;
 
@@ -49,6 +50,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.XposedInit;
+import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class Startup {
     private static void startBootstrapHook(boolean isSystem) {
@@ -67,7 +69,40 @@ public class Startup {
         LSPosedHelper.hookMethod(LoadedApkCreateCLHooker.class, LoadedApk.class, "createOrUpdateClassLoaderLocked", List.class);
         LSPosedHelper.hookAllMethods(AttachHooker.class, ActivityThread.class, "attach");
 
-        LSPosedHelper.hookMethod(ApplicationHooker.class, Application.class, "attach", Context.class);
+        //LSPosedHelper.hookMethod(ApplicationHooker.class, Application.class, "attach", Context.class);
+
+
+        XposedHelpers.findAndHookMethod(Application.class, "attach", Context.class,
+                new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+                        Log.i("LSPosed", "ApplicationHooker beforeHookedMethod ... ");
+
+                        // 获取上下文
+                        Context context = (Context) param.args[0];
+                        Log.i("LSPosed", "ApplicationHooker context : " + context );
+
+                        String packageName = context.getPackageName();
+                        String processName = packageName;
+                        if(packageName.contains("deepal")){
+                            //深蓝的应用再注入
+                            boolean isFirstPackage = packageName != null && processName != null;
+                            ClassLoader classLoader = context.getClassLoader();
+                            Log.i("LSPosed", "ApplicationHooker classLoader : " + classLoader);
+
+                            XC_LoadPackage.LoadPackageParam lpparam = new XC_LoadPackage.LoadPackageParam(
+                                    XposedBridge.sLoadedPackageCallbacks);
+                            lpparam.packageName = packageName;
+                            lpparam.processName = processName;
+                            lpparam.classLoader = classLoader;
+                            lpparam.appInfo = null;
+                            lpparam.isFirstApplication = isFirstPackage;
+                            Log.i("LSPosed", "Call handleLoadedPackage: packageName=" + lpparam.packageName + " processName=" + lpparam.processName + " isFirstPackage=" + isFirstPackage + " classLoader=" + lpparam.classLoader + " appInfo=" + lpparam.appInfo);
+                            XC_LoadPackage.callAll(lpparam);
+                        }
+                    }
+                });
 
 
     }
