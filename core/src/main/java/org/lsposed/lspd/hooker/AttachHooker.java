@@ -20,7 +20,7 @@ public class AttachHooker implements XposedInterface.Hooker {
 //    }
     @AfterInvocation
     public static void afterHookedMethod(XposedInterface.AfterHookCallback callback) {
-        Log.i("LSPosed", "AttachHooker afterHookedMethod ... ");
+        // Log.i("LSPosed", "AttachHooker afterHookedMethod ... ");
 
         ActivityThread actThreadObj = (ActivityThread) callback.getThisObject();
 
