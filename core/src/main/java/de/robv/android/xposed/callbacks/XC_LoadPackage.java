@@ -22,6 +22,7 @@ package de.robv.android.xposed.callbacks;
 
 import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -100,6 +101,7 @@ public abstract class XC_LoadPackage extends XCallback implements IXposedHookLoa
     @Override
     protected void call(Param param) throws Throwable {
         if (param instanceof LoadPackageParam)
+            Log.i("LSPosed", Log.getStackTraceString(new Throwable()));
             handleLoadPackage((LoadPackageParam) param);
     }
 }
